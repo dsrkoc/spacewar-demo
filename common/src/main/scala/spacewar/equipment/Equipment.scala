@@ -8,7 +8,7 @@ trait Equipment {
 }
 
 trait BasePackage extends Equipment {
-  override def firepower = 10
+  override def firepower = 20
   override def armour = 100
   override def agility = 0.6F
   override def accuracy = 0.6F

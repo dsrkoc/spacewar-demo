@@ -13,23 +13,26 @@ class ShipComm extends Actor {
   val supervisor = context.actorSelection(s"akka.tcp://WarRoom@${cfg.getString("host")}:${cfg.getInt("port")}/user/Supervisor")
 
   var alliance: Alliance = _
+  var name: String = _
 
   def receive = {
-    case reg: Register => supervisor ! reg
+    case reg @ Register(_, _, shipName) =>
+      name = shipName
+      supervisor ! reg
 
     case RegisterResponse(myAlliance) =>
       alliance = myAlliance
-      println(s"Your ship is registered as part of '$myAlliance' alliance")
+      println(s"Your ship ($name) is registered as part of '$myAlliance' alliance")
       context become gameIsOn
 
     case _: Fire => println("Mr Aldridge I put it to you that you are dead.")
   }
 
   def gameIsOn: Receive = {
-    case fire: Fire => supervisor ! fire.copy(alliance = Some(alliance))
+    case fire: Fire => supervisor ! fire.copy(shipName = name, alliance = Some(alliance))
 
-    case FireResponse(damage, name, isDestroyed) =>
-      println(s"You hit '$name' with $damage damage.${ if (isDestroyed) " The ship is destroyed." else "" }")
+    case FireResponse(damage, shipName, isDestroyed) =>
+      println(s"You hit '$shipName' with $damage damage.${ if (isDestroyed) " The ship is destroyed." else "" }")
 
     case ShipDamaged(armourLeft) =>
       println(s"Your ship has been hit. The armour is down to $armourLeft.")

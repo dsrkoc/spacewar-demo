@@ -11,7 +11,7 @@ class ShipController private (system: ActorSystem, ship: Ship, name: String) {
   private val comm = system.actorOf(Props[ShipComm])
   comm ! Register(ship.armour, ship.agility, name)
 
-  def fire(): Unit = comm ! Fire(ship.firepower, ship.accuracy, None)
+  def fire(): Unit = comm ! Fire("", ship.firepower, ship.accuracy, None)
 }
 
 object ShipController {

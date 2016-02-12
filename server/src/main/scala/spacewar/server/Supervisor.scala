@@ -24,10 +24,11 @@ class Supervisor extends Actor {
       val alliance = chooseAlliance
       armies += alliance -> (ShipInfo(armour, agility, name, sender) :: armies(alliance))
       receivers = sender :: receivers
+      println(s"$name is registered for '$alliance' alliance, which now counts ${armies(alliance).size} ships.")
       sender ! RegisterResponse(alliance)
 
-    case Fire(firepower, accuracy, enemyOpt) =>
-      val enemy = enemyOpt.get // of course there will be a value here ;-)
+    case Fire(attackerName, firepower, accuracy, alliance) =>
+      val enemy = alliance.get.other // of course there will be a value here in Option ;-)
       val ships = armies(enemy)
       val idx = util.Random.nextInt(ships.size)
       val ship = ships(idx)
@@ -35,6 +36,7 @@ class Supervisor extends Actor {
       val damage = calcDamage(firepower, accuracy, ship.agility)
       val remainingShield = ship.armour - damage
 
+      println(s"$attackerName inflicted $damage to ${ship.name} (remaining shield: $remainingShield).")
       if (remainingShield > 0) {
         armies(enemy) = ships.updated(idx, ship.copy(armour = remainingShield))
         sender ! FireResponse(damage, ship.name, enemyDestroyed = false)
