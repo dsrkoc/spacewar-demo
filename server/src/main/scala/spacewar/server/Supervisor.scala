@@ -8,8 +8,10 @@ import scala.collection.mutable
 
 class Supervisor extends Actor {
   private var allianceFlip = false
-  private val deathPhrases = List("%s is pushing up daisies", "%s has met their fate", "%s is six feet under",
-    "I put it to you that %s is dead", "%s went toes up")
+  private val deathPhrases = List("'%s' is pushing up daisies", "'%s' has met their fate", "'%s' is six feet under",
+    "'%s' went toes up", "'%s' is as dead as a doornail", "'%' has bitten the dust", "'%s' has put on the wooden overcoat",
+    "'%s' has assumed room temperature", "'%s' has met a sticky end", "'%s' is counting worms", "'%s' is as dead as a dodo",
+    "'%s' has gone home in a box", "'%s' met their maker", "'%s' sleeps with the fishes")
 
   private case class ShipInfo(armour: Int, agility: Float, name: String, remoteActor: ActorRef)
 
@@ -36,7 +38,7 @@ class Supervisor extends Actor {
       val damage = calcDamage(firepower, accuracy, ship.agility)
       val remainingShield = ship.armour - damage
 
-      println(s"$attackerName inflicted $damage to ${ship.name} (remaining shield: $remainingShield).")
+      println(s"'$attackerName' inflicted $damage damage to '${ship.name}' (remaining shield: $remainingShield).")
       if (remainingShield > 0) {
         armies(enemy) = ships.updated(idx, ship.copy(armour = remainingShield))
         sender ! FireResponse(damage, ship.name, enemyDestroyed = false)
